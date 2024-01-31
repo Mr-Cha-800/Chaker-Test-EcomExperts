@@ -45,7 +45,7 @@
     endfor
   -%}
 
-  {%- if block.settings.picker_type == 'button' -%}
+  {%- if block.settings.picker_type == 'button'and option.name != 'Size'  -%}
     <input
       type="radio"
       id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
@@ -59,10 +59,38 @@
         class="disabled"
       {% endif %}
     >
-    <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
+
+    {% comment %}
+    Here I added a condition to check if the variant is a color, if yes then show the image associated
+    {% endcomment %}
+      {% if option.name == 'Color' and option.name != 'Size' %}
+
+    <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+     >
+     <span   
+    >
+    <img src="{{product.variants[forloop.index0].image | img_url: ''}}"
+    style="background-size: cover;width: 28px;height: 40px;"
+    >
+    </span>
+    </label>
+
+      {% else %}
+    <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+    >
       {{ value -}}
       <span class="visually-hidden">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
     </label>
+
+    {% endif %}
+     {% if option.name != 'Size' %}
+<label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+    >
+      <span class="visually-hidden">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
+    </label>
+    </label>
+
+    {% endif %}
   {%- elsif block.settings.picker_type == 'dropdown' -%}
     <option
       value="{{ value | escape }}"
@@ -78,3 +106,20 @@
     </option>
   {%- endif -%}
 {%- endfor -%}
+
+  {%- if option.name == 'Size' -%}
+  <select 
+  name="{{ option.name }}"
+  >
+    <option value="" selected>
+    Unselected
+    </option>
+    {%- for value in option.values -%}
+      
+        <option >
+          {{value}}
+        </option>
+
+    {%- endfor -%}
+  </select>
+  {%- endif -%}
