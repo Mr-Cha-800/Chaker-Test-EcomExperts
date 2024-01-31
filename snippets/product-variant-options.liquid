@@ -45,7 +45,7 @@
     endfor
   -%}
 
-  {%- if block.settings.picker_type == 'button'and option.name != 'Size'  -%}
+  {%- if block.settings.picker_type == 'button' -%}
     <input
       type="radio"
       id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
@@ -59,13 +59,9 @@
         class="disabled"
       {% endif %}
     >
+     {% if option.name == 'Color'  %}
 
-    {% comment %}
-    Here I added a condition to check if the variant is a color, if yes then show the image associated
-    {% endcomment %}
-      {% if option.name == 'Color' and option.name != 'Size' %}
-
-    <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+    <label  for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
      >
      <span   
     >
@@ -76,18 +72,17 @@
     </label>
 
       {% else %}
-    <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
-    >
+
+      {% comment %}
+      I added a condition to test if it's size, hide visibility because I added the for loop down there
+      {% endcomment %}
+    <label 
+     {% if option.name == 'Size'  %}
+    class="visually-hidden"
+     {% endif  %}
+     for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
       {{ value -}}
       <span class="visually-hidden">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
-    </label>
-
-    {% endif %}
-     {% if option.name != 'Size' %}
-<label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
-    >
-      <span class="visually-hidden">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
-    </label>
     </label>
 
     {% endif %}
@@ -107,19 +102,50 @@
   {%- endif -%}
 {%- endfor -%}
 
+      {% comment %}
+      This is the dropdown for the size as I have added the unselected always chosen on reload
+      {% endcomment %}
   {%- if option.name == 'Size' -%}
   <select 
   name="{{ option.name }}"
+  id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+  name="{{ option.name }}"
+  value="{{ value | escape }}"
+  form="{{ product_form_id }}"
+  onchange="changeSize(value)"
   >
     <option value="" selected>
     Unselected
     </option>
     {%- for value in option.values -%}
       
-        <option >
-          {{value}}
+        <option
+          value="{{ value | escape }}"
+          {% if option.selected_value == value %}
+            selected="selected"
+          {% endif %}
+        >
+          {% if option_disabled -%}
+            {{- 'products.product.value_unavailable' | t: option_value: value -}}
+          {%- else -%}
+            {{- value -}}
+          {%- endif %}
         </option>
 
     {%- endfor -%}
   </select>
   {%- endif -%}
+
+<script>
+function changeSize(value) {
+  let selectOption = document.querySelector('[name="Size"]');
+  let addToCartButton = document.querySelector('[name="add"]');
+  selectOption.value = value
+  console.log(selectOption.value)
+  if(selectOption.value != '') {
+    addToCartButton.removeAttribute('disabled');
+  }else {
+    addToCartButton.setAttribute('disabled', true);
+  }
+}
+</script>
