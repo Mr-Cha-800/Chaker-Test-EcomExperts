@@ -128,9 +128,10 @@ class CartItems extends HTMLElement {
             }
           }
         })
-
+        // checking the products that are left in the cart to get the key of the jacket
         let leftProducts = JSON.parse(state).items;
         leftProducts.forEach((obj, key) => {
+          // the ID should be dynamic, so in a future project this ID should be dynamic not hard coded
           if(obj.id == '40296557183051'){
             JacketKeyToDelete = key + 1;
           }
@@ -193,6 +194,7 @@ class CartItems extends HTMLElement {
       .finally(() => {
         this.disableLoading(line);
 
+        // if the black bag is there then update by deleting based on the key of the jacket if found
       if(foundBagId){
           const cartItems = this.closest('cart-items') || this.closest('cart-drawer-items');
           console.log(cartItems)
