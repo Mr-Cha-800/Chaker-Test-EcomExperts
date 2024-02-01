@@ -44,6 +44,41 @@ if (!customElements.get('product-form')) {
         fetch(`${routes.cart_add_url}`, config)
           .then((response) => response.json())
           .then((response) => {
+            
+            // Start of verification if special case for black and medium
+            // getting the form data
+            const formData = new FormData(this.form);
+            let productColor = formData.get('Color')
+            let productSize = formData.get('Size')
+            // checking if it's medium and black
+            if(productSize == 'Medium' && productColor == 'Black' ){
+              const config = fetchConfig('javascript');
+              config.headers['X-Requested-With'] = 'XMLHttpRequest';
+              delete config.headers['Content-Type'];
+              // getting the updated ID from Shopify Store products
+              let updateInfo = {
+                id: '40296557183051'
+              }
+              if (this.cart) {
+                formData.append(
+                  'sections',
+                  this.cart.getSectionsToRender().map((section) => section.id)
+                );
+                formData.append('sections_url', window.location.pathname);
+                this.cart.setActiveElement(document.activeElement);
+              }
+              // updating the id with the new one
+              formData.delete('id')
+              formData.append('id', updateInfo.id)
+              config.body = formData;
+              fetch(`${routes.cart_add_url}`,config)
+              .then((response) => response.json())
+              .then((response) => {
+                console.log(response)
+              })
+            }
+            
+            // END of verification if special case for black and medium
             if (response.status) {
               publish(PUB_SUB_EVENTS.cartError, {
                 source: 'product-form',
@@ -54,11 +89,14 @@ if (!customElements.get('product-form')) {
               this.handleErrorMessage(response.description);
 
               const soldOutMessage = this.submitButton.querySelector('.sold-out-message');
-              if (!soldOutMessage) return;
+              if (!soldOutMessage) 
               this.submitButton.setAttribute('aria-disabled', true);
               this.submitButton.querySelector('span').classList.add('hidden');
               soldOutMessage.classList.remove('hidden');
               this.error = true;
+
+
+
               return;
             } else if (!this.cart) {
               window.location = window.routes.cart_url;
