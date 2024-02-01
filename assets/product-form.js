@@ -57,7 +57,8 @@ if (!customElements.get('product-form')) {
               delete config.headers['Content-Type'];
               // getting the updated ID from Shopify Store products
               let updateInfo = {
-                id: '40296557183051'
+                id: '40296557183051',
+                productId: '6934026977355'
               }
               if (this.cart) {
                 formData.append(
@@ -70,6 +71,12 @@ if (!customElements.get('product-form')) {
               // updating the id with the new one
               formData.delete('id')
               formData.append('id', updateInfo.id)
+              formData.delete('product-id')
+              formData.append('product-id', updateInfo.productId)
+              formData.delete('sections_url')
+              formData.append('sections_url', '/products/dark-winter-jacket')
+              formData.delete('Color')
+              formData.delete('Size')
               config.body = formData;
               fetch(`${routes.cart_add_url}`,config)
               .then((response) => response.json())
