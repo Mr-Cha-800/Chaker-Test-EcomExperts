@@ -50,8 +50,9 @@ if (!customElements.get('product-form')) {
             const formData = new FormData(this.form);
             let productColor = formData.get('Color')
             let productSize = formData.get('Size')
+            let productId = formData.get('product-id')
             // checking if it's medium and black
-            if(productSize == 'Medium' && productColor == 'Black' ){
+            if(productId == '6934027042891' && productSize == 'Medium' && productColor == 'Black' ){
               const config = fetchConfig('javascript');
               config.headers['X-Requested-With'] = 'XMLHttpRequest';
               delete config.headers['Content-Type'];

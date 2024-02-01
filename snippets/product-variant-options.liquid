@@ -139,11 +139,9 @@
 
 <script>
 function changeSize(value) {
-  console.log('TESTSTS')
   let selectOption = document.querySelector('[name="Size"]');
   let addToCartButton = document.querySelector('[name="add"]');
   selectOption.value = value
-  console.log(selectOption.value)
   if(selectOption.value != '') {
     addToCartButton.removeAttribute('disabled');
   }else {
