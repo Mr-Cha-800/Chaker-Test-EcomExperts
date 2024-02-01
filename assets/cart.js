@@ -105,7 +105,6 @@ class CartItems extends HTMLElement {
 
   updateQuantity(line, quantity, name, variantId) {
     this.enableLoading(line);
-
     const body = JSON.stringify({
       line,
       quantity,
@@ -113,16 +112,34 @@ class CartItems extends HTMLElement {
       sections_url: window.location.pathname,
     });
 
+    let foundBagId = false;
+    let JacketKeyToDelete;
     fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body } })
       .then((response) => {
         return response.text();
       })
       .then((state) => {
+        let newState = JSON.parse(state).items_removed
+        newState.forEach((obj) => {
+          if(obj.untranslated_variant_title != null){
+            let variant_title = obj.untranslated_variant_title.toLowerCase()
+            if(obj.product_id = '6934027042891' && variant_title.includes('medium') && variant_title.includes('black')){
+              foundBagId = true;
+            }
+          }
+        })
+        // checking the products that are left in the cart to get the key of the jacket
+        let leftProducts = JSON.parse(state).items;
+        leftProducts.forEach((obj, key) => {
+          // the ID should be dynamic, so in a future project this ID should be dynamic not hard coded
+          if(obj.id == '40296557183051'){
+            JacketKeyToDelete = key + 1;
+          }
+        })
         const parsedState = JSON.parse(state);
         const quantityElement =
           document.getElementById(`Quantity-${line}`) || document.getElementById(`Drawer-quantity-${line}`);
         const items = document.querySelectorAll('.cart-item');
-
         if (parsedState.errors) {
           quantityElement.value = quantityElement.getAttribute('value');
           this.updateLiveRegions(line, parsedState.errors);
@@ -176,9 +193,16 @@ class CartItems extends HTMLElement {
       })
       .finally(() => {
         this.disableLoading(line);
-      });
-  }
 
+        // if the black bag is there then update by deleting based on the key of the jacket if found
+      if(foundBagId){
+          const cartItems = this.closest('cart-items') || this.closest('cart-drawer-items');
+          console.log(cartItems)
+          cartItems.updateQuantity(JacketKeyToDelete.toString(), 0); 
+        }
+      });
+
+  }
   updateLiveRegions(line, message) {
     const lineItemError =
       document.getElementById(`Line-item-error-${line}`) || document.getElementById(`CartDrawer-LineItemError-${line}`);

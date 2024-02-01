@@ -147,3 +147,18 @@
     <script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
 </div>
+
+
+<script>
+
+//Cheking the variants if there aren't any, the button would show, the other case it would be disabled
+
+let selectOptionSize = document.querySelector('[name="Size"]');
+let selectOptionColor = document.querySelector('[name="Color"]');
+if(selectOptionSize != null || selectOptionColor != null){
+
+let addToCartButton = document.querySelector('[name="add"]');
+addToCartButton.setAttribute('disabled', true);
+}
+
+</script>

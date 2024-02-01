@@ -59,10 +59,33 @@
         class="disabled"
       {% endif %}
     >
-    <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
+     {% if option.name == 'Color'  %}
+
+    <label  for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+     >
+     <span   
+    >
+    <img src="{{product.variants[forloop.index0].image | img_url: ''}}"
+    style="background-size: cover;width: 28px;height: 40px;"
+    >
+    </span>
+    </label>
+
+      {% else %}
+
+      {% comment %}
+      I added a condition to test if it's size, hide visibility because I added the for loop down there
+      {% endcomment %}
+    <label 
+     {% if option.name == 'Size'  %}
+    class="visually-hidden"
+     {% endif  %}
+     for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
       {{ value -}}
       <span class="visually-hidden">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
     </label>
+
+    {% endif %}
   {%- elsif block.settings.picker_type == 'dropdown' -%}
     <option
       value="{{ value | escape }}"
@@ -78,3 +101,55 @@
     </option>
   {%- endif -%}
 {%- endfor -%}
+
+      {% comment %}
+      This is the dropdown for the size as I have added the unselected always chosen on reload
+      {% endcomment %}
+  {%- if option.name == 'Size' -%}
+  <select 
+  name="{{ option.name }}"
+  id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+  name="{{ option.name }}"
+  value="{{ value | escape }}"
+  form="{{ product_form_id }}"
+  onchange="changeSize(value)"
+  >
+  
+    <option value="" selected>
+    Unselected
+    </option>
+        {% assign option.selected_value = '' %}
+        
+    {%- for value in option.values -%}
+      {% assign value = '' %}
+        <option
+          value="{{ value | escape }}"
+          
+        >
+          {% if option_disabled -%}
+            {{- 'products.product.value_unavailable' | t: option_value: value -}}
+          {%- else -%}
+            {{- value -}}
+          {%- endif %}
+        </option>
+
+    {%- endfor -%}
+  </select>
+  {%- endif -%}
+
+<script>
+
+//function to check the size selected and change the status of the "Add to cart" button
+function changeSize(value) {
+  let selectOption = document.querySelector('[name="Size"]');
+  let addToCartButton = document.querySelector('[name="add"]');
+  selectOption.value = value
+  if(selectOption.value != '') {
+    addToCartButton.removeAttribute('disabled');
+  }else {
+    addToCartButton.setAttribute('disabled', true);
+  }
+}
+
+
+</script>
